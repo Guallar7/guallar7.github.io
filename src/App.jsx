@@ -3,26 +3,32 @@ import {
   ArrowUpRight,
   BookOpen,
   Briefcase,
+  Check,
   Code2,
   Compass,
+  Copy,
   Github,
   GraduationCap,
   Layers,
   Linkedin,
   Mail,
+  NotebookPen,
   Stethoscope,
   Twitter,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import './App.css'
+import { notes } from './notes'
 
 const asset = (path) => `${import.meta.env.BASE_URL}${path}`
+
+const email = 'davidguallargarcia@gmail.com'
 
 const navItems = [
   { id: 'trayectoria', label: 'Trayectoria', icon: Activity },
   { id: 'proyectos', label: 'Proyectos', icon: Layers },
+  { id: 'notas', label: 'Notas', icon: NotebookPen },
   { id: 'ia', label: 'IA', icon: BookOpen },
-  { id: 'enfoque', label: 'Enfoque', icon: Compass },
   { id: 'contacto', label: 'Contacto', icon: Mail },
 ]
 
@@ -38,6 +44,12 @@ const discoveryItems = [
     icon: Layers,
     label: 'Proyectos',
     text: 'Herramientas clínicas, IA y recursos abiertos.',
+  },
+  {
+    href: '#notas',
+    icon: NotebookPen,
+    label: 'Notas',
+    text: 'Ideas y aprendizajes sobre medicina, tecnología e IA.',
   },
   {
     href: '#enfoque',
@@ -160,30 +172,6 @@ const aiAdvice = [
   },
 ]
 
-const aiTopics = [
-  {
-    title: 'Consejos para hablar con IA',
-    status: 'Disponible',
-    href: '#ia-consejos',
-    text: 'Contexto, límites, formatos y pequeños trucos para pedir mejor.',
-  },
-  {
-    title: 'Herramientas que uso',
-    status: 'Próximamente',
-    text: 'Aplicaciones y flujos que me parecen útiles en el trabajo diario.',
-  },
-  {
-    title: 'Skills y métodos',
-    status: 'Próximamente',
-    text: 'Formas de convertir tareas repetidas en procesos más claros.',
-  },
-  {
-    title: 'Enlaces y noticias',
-    status: 'Próximamente',
-    text: 'Recursos seleccionados sin intentar cubrirlo todo.',
-  },
-]
-
 const markdownCheatsheet = [
   ['# Título', 'Título principal'],
   ['## Sección', 'Separar partes del prompt'],
@@ -215,9 +203,20 @@ Dame 5 puntos, evita tecnicismos innecesarios y señala dudas.
 function App() {
   const [activeSection, setActiveSection] = useState('inicio')
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [emailCopied, setEmailCopied] = useState(false)
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(email)
+      setEmailCopied(true)
+      setTimeout(() => setEmailCopied(false), 2200)
+    } catch {
+      window.location.href = `mailto:${email}`
+    }
+  }
 
   useEffect(() => {
-    const sectionIds = ['inicio', ...navItems.map((item) => item.id)]
+    const sectionIds = ['inicio', ...navItems.map((item) => item.id), 'enfoque']
 
     const updateProgress = () => {
       const scrollable =
@@ -257,6 +256,9 @@ function App() {
 
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#trayectoria">
+        Saltar al contenido
+      </a>
       <header className="topbar">
         <div
           className="scroll-progress"
@@ -287,7 +289,7 @@ function App() {
             <img
               className="hero-avatar"
               src={asset('david-guallar-profile.webp')}
-              alt="Ilustración de perfil de David Guallar"
+              alt="Fotografía de David Guallar"
             />
             <p className="eyebrow">
               Médico especialista en Anestesiología y Reanimación
@@ -333,7 +335,7 @@ function App() {
             <img
               className="profile-portrait"
               src={asset('david-guallar-profile.webp')}
-              alt="Ilustración de perfil de David Guallar"
+              alt="Fotografía de David Guallar"
             />
             <div>
               <span className="panel-label">Ahora mismo</span>
@@ -444,35 +446,48 @@ function App() {
           </div>
         </section>
 
-        <section className="section ai-section" id="ia">
+        <section className="section notes-section" id="notas">
           <div className="section-heading">
-            <p className="eyebrow">03 / IA práctica</p>
-            <h2>Un espacio para aprender y trabajar mejor con IA</h2>
+            <p className="eyebrow">03 / Notas</p>
+            <h2>Cosas que pienso, pruebo o aprendo</h2>
             <p>
-              Esta parte irá creciendo como una guía personal: consejos,
-              herramientas, skills, enlaces y recursos que me parezcan útiles.
-              De momento empiezo por lo más práctico: cómo hablar con la IA
-              para obtener mejores respuestas.
+              Notas breves sobre medicina, tecnología e IA. Sin calendario fijo:
+              aparecen cuando hay algo que merece la pena contar.
             </p>
           </div>
 
-          <div className="ai-topic-grid" aria-label="Apartados de IA práctica">
-            {aiTopics.map(({ title, status, text, href }) =>
-              href ? (
-                <a className="ai-topic-card available" href={href} key={title}>
-                  <span>{status}</span>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </a>
-              ) : (
-                <article className="ai-topic-card" key={title}>
-                  <span>{status}</span>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </article>
-              ),
-            )}
+          <div className="notes-list">
+            {notes.map((note, index) => (
+              <article className="note" id={`nota-${note.slug}`} key={note.slug}>
+                <details open={index === 0}>
+                  <summary>
+                    {note.displayDate && (
+                      <time dateTime={note.date}>{note.displayDate}</time>
+                    )}
+                    <h3>{note.title}</h3>
+                    {note.summary && <p>{note.summary}</p>}
+                  </summary>
+                  <div
+                    className="note-body"
+                    dangerouslySetInnerHTML={{ __html: note.html }}
+                  />
+                </details>
+              </article>
+            ))}
           </div>
+        </section>
+
+        <section className="section ai-section" id="ia">
+          <div className="section-heading">
+            <p className="eyebrow">04 / IA práctica</p>
+            <h2>Un espacio para aprender y trabajar mejor con IA</h2>
+            <p>
+              Una guía personal que irá creciendo poco a poco. De momento
+              empiezo por lo más práctico: cómo hablar con la IA para obtener
+              mejores respuestas.
+            </p>
+          </div>
+
 
           <div className="ai-content-block" id="ia-consejos">
             <div className="subsection-heading">
@@ -537,7 +552,7 @@ function App() {
 
         <section className="section split-section" id="enfoque">
           <div className="section-heading narrow">
-            <p className="eyebrow">04 / Enfoque</p>
+            <p className="eyebrow">05 / Enfoque</p>
             <h2>No intento parecer programador. Intento resolver cosas.</h2>
           </div>
 
@@ -572,12 +587,33 @@ function App() {
 
         <section className="contact-band" id="contacto">
           <div>
-            <p className="eyebrow">05 / Contacto</p>
-            <h2>Si algo te interesa, puedes escribirme o ver el código.</h2>
+            <p className="eyebrow">06 / Contacto</p>
+            <h2>Si algo te sirve o se te ocurre cómo mejorarlo, escríbeme.</h2>
+            <p className="contact-text">
+              Sobre todo si eres anestesista, residente o sanitario y quieres
+              probar alguna herramienta o compartir impresiones.
+            </p>
           </div>
           <div className="contact-actions">
+            <a className="button primary" href={`mailto:${email}`}>
+              <Mail size={18} aria-hidden="true" />
+              Escribirme
+            </a>
+            <button
+              className="button secondary"
+              type="button"
+              onClick={copyEmail}
+              aria-live="polite"
+            >
+              {emailCopied ? (
+                <Check size={18} aria-hidden="true" />
+              ) : (
+                <Copy size={18} aria-hidden="true" />
+              )}
+              {emailCopied ? 'Copiado' : 'Copiar email'}
+            </button>
             <a
-              className="button primary"
+              className="button secondary"
               href="https://github.com/Guallar7"
               target="_blank"
               rel="noreferrer"
@@ -603,16 +639,23 @@ function App() {
               <Linkedin size={18} aria-hidden="true" />
               LinkedIn
             </a>
-            <a
-              className="button secondary"
-              href="mailto:davidguallargarcia@gmail.com"
-            >
-              <Mail size={18} aria-hidden="true" />
-              Email
-            </a>
           </div>
         </section>
       </main>
+
+      <footer className="site-footer">
+        <p>© {new Date().getFullYear()} David Guallar · Zaragoza</p>
+        <p>
+          Hecha con ayuda de IA y revisada a mano ·{' '}
+          <a
+            href="https://github.com/Guallar7/guallar7.github.io"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Código de esta web
+          </a>
+        </p>
+      </footer>
 
       <nav className="mobile-bottom-nav" aria-label="Navegación móvil">
         {navItems.map(({ id, label, icon: Icon }) => (
