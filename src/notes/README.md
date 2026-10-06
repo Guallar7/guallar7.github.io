@@ -19,6 +19,6 @@ Primer párrafo.
 - **Negritas** y [enlaces](https://www.app-pbm.com)
 ```
 
-3. Si pones `draft: true`, la nota no se publica.
+3. **Borradores:** si el nombre del archivo empieza por `_` (por ejemplo `_borrador-idea.md`), la nota no entra en la web. Para publicarla, quita el `_` del nombre y pon `draft: false`. (Ojo: el repositorio es público, así que el archivo sí se puede ver en GitHub.)
 4. Las notas se ordenan solas por fecha, de la más reciente a la más antigua.
 5. Haz commit y push: GitHub publica la web automáticamente en un par de minutos.

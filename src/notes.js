@@ -1,7 +1,8 @@
 import { marked } from 'marked'
 
-// Cada archivo .md de src/notes es una nota. Ver src/notes/README.md.
-const files = import.meta.glob('./notes/*.md', {
+// Cada archivo .md de src/notes es una nota. Los que empiezan por _ son
+// borradores y no se incluyen en la web. Ver src/notes/README.md.
+const files = import.meta.glob(['./notes/*.md', '!./notes/_*.md', '!./notes/README.md'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -33,7 +34,6 @@ const dateFormatter = new Intl.DateTimeFormat('es-ES', {
 })
 
 export const notes = Object.entries(files)
-  .filter(([path]) => !path.endsWith('README.md'))
   .map(([path, raw]) => {
     const { data, body } = parseFrontmatter(raw)
     const slug = path.split('/').pop().replace(/\.md$/, '')
