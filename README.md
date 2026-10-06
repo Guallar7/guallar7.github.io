@@ -21,5 +21,14 @@ npm run dev
 
 ## Publicación
 
+Antes de publicar, ejecuta `npm run lint` y `npm run build`.
+La compilación genera el HTML de la portada con `scripts/prerender.mjs`, usando
+el mismo componente React y el mismo filtro de notas publicadas que el navegador.
+El contenido se puede leer sin JavaScript; React activa después las interacciones
+mediante hidratación. No edites `dist/index.html` a mano.
+
+Los iconos y el manifiesto están en `public/`. El manifiesto usa el modo `browser`
+para conservar el comportamiento de una web personal normal.
+
 Cada `git push` a la rama `main` compila la web y la publica en GitHub Pages
 (`.github/workflows/deploy.yml`). Tarda un par de minutos.
