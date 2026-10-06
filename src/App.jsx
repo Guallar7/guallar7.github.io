@@ -1,5 +1,6 @@
 import {
   Activity,
+  ArrowDown,
   ArrowUpRight,
   BookOpen,
   Briefcase,
@@ -243,12 +244,56 @@ function App() {
       if (section) observer.observe(section)
     })
 
+    // Aparición suave de bloques al hacer scroll.
+    const revealSelector = [
+      '.section-heading',
+      '.subsection-heading',
+      '.timeline-item',
+      '.career-focus',
+      '.project-card',
+      '.note',
+      '.advice-card',
+      '.prompt-example',
+      '.cheatsheet-card',
+      '.principles > div',
+      '.contact-band > *',
+    ].join(', ')
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+    let revealObserver
+
+    if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+      document.documentElement.classList.add('js-reveal')
+      revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return
+            entry.target.classList.add('is-visible')
+            revealObserver.unobserve(entry.target)
+          })
+        },
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+      )
+
+      document.querySelectorAll(revealSelector).forEach((element) => {
+        const siblings = [...element.parentElement.children].filter((child) =>
+          child.matches(revealSelector),
+        )
+        const index = Math.min(siblings.indexOf(element), 4)
+        element.style.setProperty('--reveal-delay', `${index * 80}ms`)
+        element.classList.add('reveal')
+        revealObserver.observe(element)
+      })
+    }
+
     updateProgress()
     window.addEventListener('scroll', updateProgress, { passive: true })
     window.addEventListener('resize', updateProgress)
 
     return () => {
       observer.disconnect()
+      revealObserver?.disconnect()
       window.removeEventListener('scroll', updateProgress)
       window.removeEventListener('resize', updateProgress)
     }
@@ -329,6 +374,11 @@ function App() {
               </a>
             ))}
           </div>
+
+          <a className="scroll-cue" href="#trayectoria">
+            <ArrowDown size={16} aria-hidden="true" />
+            Sigue bajando
+          </a>
         </div>
 
           <aside className="hero-panel" aria-label="Resumen">
